@@ -1,0 +1,43 @@
+[tools]
+python = "3.13"
+uv = "latest"
+
+[env]
+KERAS_BACKEND = "tensorflow"
+
+[tasks.sync]
+description = "Sync deps for a lab (default: lab1)"
+usage = '''
+arg "[lab]" help="Lab directory name" default="lab1"
+'''
+run = "cd \"$usage_lab\" && uv sync"
+
+[tasks.jupyter]
+description = "Launch Jupyter Lab in a lab env"
+usage = '''
+arg "[lab]" help="Lab directory name" default="lab1"
+'''
+run = "cd \"$usage_lab\" && uv run jupyter lab"
+
+[tasks.kernel]
+description = "Register Jupyter kernel for a lab"
+usage = '''
+arg "[lab]" help="Lab directory name" default="lab1"
+'''
+run = 'cd "$usage_lab" && uv run python -m ipykernel install --user --name="$usage_lab" --display-name="Python ($usage_lab)"'
+
+[tasks.check]
+description = "Smoke-check TF/Keras + GPU visibility"
+usage = '''
+arg "[lab]" help="Lab directory name" default="lab1"
+'''
+run = '''
+cd "$usage_lab" && uv run python -c "
+import tensorflow as tf
+import keras
+print('python ok')
+print('tensorflow', tf.__version__)
+print('keras', keras.__version__)
+print('gpus', tf.config.list_physical_devices('GPU'))
+"
+'''
